@@ -14,9 +14,20 @@ Future main() async {
   runApp(MyApp());
 }
 
-final List<String> entries = <String>['Aries', 'Tauro', 'Geminis', 'Cancer', 'Leo',
-                                      'Virgo', 'Libra', 'Escorpio', 'Sagitario',
-                                        'Capricornio', 'Acuario', 'Piscis'];
+final List<String> entries = <String>[
+  'Aries',
+  'Tauro',
+  'Geminis',
+  'Cancer',
+  'Leo',
+  'Virgo',
+  'Libra',
+  'Escorpio',
+  'Sagitario',
+  'Capricornio',
+  'Acuario',
+  'Piscis'
+];
 
 class MyApp extends StatelessWidget {
   @override
@@ -29,7 +40,7 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         backgroundColor: const Color(0xFF002233),
-        drawer: Drawer(),
+        drawer: _DrawerPrincipal(),
         body: SafeArea(
           child: Column(
             children: [
@@ -38,8 +49,7 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
-        bottomNavigationBar: _MenuInferior(),
-
+        // bottomNavigationBar: _MenuInferior(),
       ),
     );
   }
@@ -54,18 +64,10 @@ class _MenuInferior extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home'
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings'
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.all_inclusive),
-          label: 'More...'
-        ),
+            icon: Icon(Icons.all_inclusive), label: 'More...'),
       ],
     );
   }
@@ -113,13 +115,11 @@ class _MenuPrincipal extends StatelessWidget {
             ),
             child: Center(
               child: TextButton(
-                onPressed: () => {
-                  debugPrint('Prueba ${entries[index]}')
-                },
-               child: Text(
-                 '${entries[index]}',
-                 style: TextStyle(color: Colors.white),
-               ),
+                onPressed: () => {debugPrint('Prueba ${entries[index]}')},
+                child: Text(
+                  '${entries[index]}',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           );
@@ -154,6 +154,42 @@ class _AppBar extends StatelessWidget {
             ),
           ),
           _MenuPrincipal(),
+        ],
+      ),
+    );
+  }
+}
+
+class _DrawerPrincipal extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      elevation: 2,
+      child: ListView(
+        children: [
+          DrawerHeader(
+            padding: EdgeInsets.all(20),
+            child: Text(
+              'Prueba Encabezado',
+              style: TextStyle(fontSize: 42),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+            ),
+          ),
+          ListTile(
+            title: Text('Settings'),
+            leading: Icon(Icons.home),
+          ),
+          ListTile(
+            title: Text('Comming soon...'),
+            leading: Icon(Icons.info_outline),
+          ),
+          Divider(),
+          ListTile(
+            title: Text('Privacy Policy'),
+            leading: Icon(Icons.security),
+          ),
         ],
       ),
     );
