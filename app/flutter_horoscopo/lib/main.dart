@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 Future main() async {
@@ -10,9 +11,10 @@ Future main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // await SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
   runApp(MyApp());
 }
+
+final annioActual = DateTime.now();
 
 final List<String> entries = <String>[
   'Aries',
@@ -49,26 +51,7 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
-        // bottomNavigationBar: _MenuInferior(),
       ),
-    );
-  }
-}
-
-class _MenuInferior extends StatelessWidget {
-  const _MenuInferior({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.all_inclusive), label: 'More...'),
-      ],
     );
   }
 }
@@ -163,34 +146,47 @@ class _AppBar extends StatelessWidget {
 class _DrawerPrincipal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      elevation: 2,
-      child: ListView(
-        children: [
-          DrawerHeader(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              'Prueba Encabezado',
-              style: TextStyle(fontSize: 42),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-            ),
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 40, 0, 20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+        child: Drawer(
+          elevation: 2,
+          child: ListView(
+            padding: EdgeInsets.all(0),
+            children: [
+              DrawerHeader(
+                // padding: EdgeInsets.all(20),
+                child: Text(
+                  'Horoscopo ${annioActual.year}',
+                  style: TextStyle(
+                    fontSize: 42,
+                    color: Colors.white,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF002233),
+                ),
+              ),
+              ListTile(
+                title: Text('Settings'),
+                leading: Icon(Icons.home),
+              ),
+              ListTile(
+                title: Text('Comming soon...'),
+                leading: Icon(Icons.info_outline),
+              ),
+              Divider(),
+              ListTile(
+                title: Text('Privacy Policy'),
+                leading: Icon(Icons.security),
+              ),
+            ],
           ),
-          ListTile(
-            title: Text('Settings'),
-            leading: Icon(Icons.home),
-          ),
-          ListTile(
-            title: Text('Comming soon...'),
-            leading: Icon(Icons.info_outline),
-          ),
-          Divider(),
-          ListTile(
-            title: Text('Privacy Policy'),
-            leading: Icon(Icons.security),
-          ),
-        ],
+        ),
       ),
     );
   }
