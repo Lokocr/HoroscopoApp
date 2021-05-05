@@ -11,24 +11,40 @@ Future main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  // await SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
   runApp(MyApp());
 }
 
 final annioActual = DateTime.now();
 
+final List<String> entriesImages = <String>[
+  '005-aries.png',
+  '030-taurus.png',
+  '012-gemini.png',
+  '008-cancer.png',
+  '015-leo.png',
+  '032-uranus.png',
+  '017-libra.png',
+  '027-scorpio.png',
+  '024-sagittarius.png',
+  '010-capricorn.png',
+  '003-aquarius.png',
+  '022-pisces.png'
+];
+
 final List<String> entries = <String>[
   'Aries',
-  'Tauro',
+  'Taurus',
   'Geminis',
   'Cancer',
   'Leo',
   'Virgo',
   'Libra',
-  'Escorpio',
-  'Sagitario',
-  'Capricornio',
-  'Acuario',
-  'Piscis'
+  'Scorpio',
+  'Sagittarius',
+  'Capricorn',
+  'Aquarius',
+  'Pisces'
 ];
 
 class MyApp extends StatelessWidget {
@@ -47,7 +63,7 @@ class MyApp extends StatelessWidget {
           child: Column(
             children: [
               _AppBar(),
-              _MainContent(),
+              _MenuPrincipal(),
             ],
           ),
         ),
@@ -82,31 +98,52 @@ class _MenuPrincipal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 90,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: entries.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            width: 150,
-            margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade600,
-              borderRadius: BorderRadius.all(Radius.circular(50)),
-            ),
-            child: Center(
-              child: TextButton(
-                onPressed: () => {debugPrint('Prueba ${entries[index]}')},
-                child: Text(
-                  '${entries[index]}',
-                  style: TextStyle(color: Colors.white),
-                ),
+    return Expanded(
+      child: Container(
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
+          itemCount: entries.length,
+          scrollDirection: Axis.vertical,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              width: double.infinity,
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
               ),
-            ),
-          );
-        },
+              child: Stack(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Image(
+                      image:
+                          AssetImage('assets/graphics/${entriesImages[index]}'),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextButton(
+                      onPressed: () => {debugPrint('Prueba ${entries[index]}')},
+                      child: Text(
+                        '${entries[index]}',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -120,23 +157,22 @@ class _AppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: 60,
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
       decoration: BoxDecoration(
         color: const Color(0XFF002233),
       ),
       child: Column(
         children: [
           Text(
-            'Horoscopo 2021',
+            'Horoscope ${annioActual.year}',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 32,
             ),
           ),
-          _MenuPrincipal(),
         ],
       ),
     );
