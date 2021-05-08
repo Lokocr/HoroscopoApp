@@ -59,10 +59,16 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         backgroundColor: const Color(0xFF002233),
         drawer: _DrawerPrincipal(),
+        appBar: AppBar(
+          title: Text('Horoscope ${annioActual.year}'),
+          centerTitle: true,
+          backgroundColor: const Color(0xFF002233),
+          elevation: 0,
+        ),
         body: SafeArea(
           child: Column(
             children: [
-              _AppBar(),
+              // _AppBar(),
               _MenuPrincipal(),
             ],
           ),
@@ -110,10 +116,6 @@ class _MenuPrincipal extends StatelessWidget {
             return Container(
               width: double.infinity,
               margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              ),
               child: Stack(
                 children: [
                   Container(
@@ -124,17 +126,21 @@ class _MenuPrincipal extends StatelessWidget {
                     ),
                   ),
                   Container(
+                    alignment: Alignment.bottomCenter,
                     margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
                     child: TextButton(
                       onPressed: () => {debugPrint('Prueba ${entries[index]}')},
-                      child: Text(
-                        '${entries[index]}',
-                        style: TextStyle(
-                          color: Colors.black,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${entries[index]}',
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
