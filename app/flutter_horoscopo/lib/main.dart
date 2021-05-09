@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_horoscopo/views/signView.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,29 +69,9 @@ class MyApp extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              // _AppBar(),
               _MenuPrincipal(),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MainContent extends StatelessWidget {
-  const _MainContent({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
       ),
     );
@@ -131,15 +112,25 @@ class _MenuPrincipal extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => {debugPrint('Prueba ${entries[index]}')},
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          '${entries[index]}',
-                          style: TextStyle(
-                            color: Colors.black,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.white)),
+                          onPressed: () => {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SignView(
+                                  signName: entries[index],
+                                ),
+                              ),
+                            )
+                          },
+                          child: Text(
+                            '${entries[index]}',
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
