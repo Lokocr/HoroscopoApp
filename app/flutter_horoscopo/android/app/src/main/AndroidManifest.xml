@@ -1,8 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.josecartin.flutter_horoscopo">
+    <!-- Required to fetch data from the internet. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
    <application
         android:label="Horoscopo 2021"
         android:icon="@mipmap/launcher_icon">
+        
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

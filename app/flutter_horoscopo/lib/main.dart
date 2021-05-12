@@ -69,6 +69,7 @@ class MyApp extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
+              // _AppBar(),
               _MenuPrincipal(),
             ],
           ),
@@ -120,7 +121,7 @@ class _MenuPrincipal extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignView(
+                                builder: (context) => StateSignView(
                                   signName: entries[index],
                                 ),
                               ),
