@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_horoscopo/models/horoscope.dart';
 import 'package:http/http.dart' as http;
 
-Future<Horoscope> fetchDataSign() async {
+Future<Horoscope> fetchDataSign(String _signName) async {
   final response = await http.get(
-    Uri.https('ohmanda.com', 'api/horoscope/aquarius'),
+    Uri.http('horoscopoapi.centralus.azurecontainer.io',
+        'api/v1/horoscope/getalldetails/' + _signName),
   );
 
   // Validate if the response is OK.
   if (response.statusCode == 200) {
-    return Horoscope.fromJson(jsonDecode(response.body));
+    Horoscope _respose = Horoscope.fromJson(jsonDecode(response.body));
+    _respose.sign = _signName;
+    return _respose;
   } else {
     throw Exception('Failed to load data from API.');
   }
@@ -24,16 +27,19 @@ class StateSignView extends StatefulWidget {
   StateSignView({Key key, @required this.signName}) : super(key: key);
 
   @override
-  __StateSignViewState createState() => __StateSignViewState();
+  __StateSignViewState createState() => __StateSignViewState(this.signName);
 }
 
 class __StateSignViewState extends State<StateSignView> {
   Future<Horoscope> futureHoroscope;
+  final String signName;
+
+  __StateSignViewState(this.signName);
 
   @override
   void initState() {
     super.initState();
-    futureHoroscope = fetchDataSign();
+    futureHoroscope = fetchDataSign(this.signName);
   }
 
   @override
@@ -41,7 +47,7 @@ class __StateSignViewState extends State<StateSignView> {
     return Scaffold(
       backgroundColor: const Color(0xFF002233),
       appBar: AppBar(
-        title: Text('Horoscope'),
+        title: Text('Horoscope ${this.signName}'),
         centerTitle: true,
         backgroundColor: const Color(0xFF002233),
         elevation: 0,
@@ -66,87 +72,222 @@ class _MainContent extends StatelessWidget {
     return FutureBuilder<Horoscope>(
       future: horoscope,
       builder: (context, snapshot) {
-        debugPrint('Data: $horoscope');
-
         if (snapshot.hasData) {
           return Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Container(
-                padding: EdgeInsets.all(20),
-                margin: EdgeInsets.all(10),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200.withOpacity(0.9),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5),
-                  ),
-                ),
-                child: Text('Information about sign: ${snapshot.data.sign}'),
-              ),
               Expanded(
                 child: SingleChildScrollView(
                   child: Container(
-                      padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(
-                              left: 30,
-                            ),
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0.9),
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                topLeft: Radius.circular(10),
+                    padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.only(
+                                  left: 30,
+                                  bottom: 30,
+                                ),
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal.shade200.withOpacity(0.9),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Date: ',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.only(
-                              right: 30,
-                              top: 20,
-                            ),
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0.9),
-                              borderRadius: BorderRadius.only(
-                                bottomRight: Radius.circular(10),
-                                topRight: Radius.circular(10),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.only(
+                                  right: 30,
+                                  bottom: 30,
+                                ),
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200.withOpacity(0.9),
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Text(
+                                      snapshot.data.current_date,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            child: Text(snapshot.data.horoscope),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(
-                              left: 30,
-                              top: 20,
-                            ),
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0.9),
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                topLeft: Radius.circular(10),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.only(
+                                  left: 30,
+                                ),
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal.shade200.withOpacity(0.9),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Number: ',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          // Este sera para anuncios.
-                          Container(
-                            margin: EdgeInsets.fromLTRB(10, 20, 10, 0),
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0.9),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.only(
+                                  right: 30,
+                                ),
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200.withOpacity(0.9),
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Text(
+                                      snapshot.data.lucky_number,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                            child: Center(
-                              child: Text('Cuadro de anuncios.'),
+                          ],
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.only(
+                            right: 30,
+                            top: 20,
+                            bottom: 20,
+                            left: 30,
+                          ),
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200.withOpacity(0.9),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
                             ),
                           ),
-                        ],
-                      )),
+                          child: Text(
+                            snapshot.data.description,
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.only(
+                                  left: 30,
+                                ),
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal.shade200.withOpacity(0.9),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Color: ',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.only(
+                                  right: 30,
+                                ),
+                                height: 80,
+                                decoration: BoxDecoration(
+                                    color:
+                                        Colors.grey.shade200.withOpacity(0.9),
+                                    borderRadius: BorderRadius.only(
+                                      bottomRight: Radius.circular(10),
+                                      topRight: Radius.circular(10),
+                                    )),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Text(
+                                      snapshot.data.color,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -155,7 +296,7 @@ class _MainContent extends StatelessWidget {
           return Text("${snapshot.error}");
         }
 
-        return CircularProgressIndicator();
+        return LinearProgressIndicator();
       },
     );
   }

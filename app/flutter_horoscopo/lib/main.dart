@@ -36,7 +36,7 @@ final List<String> entriesImages = <String>[
 final List<String> entries = <String>[
   'Aries',
   'Taurus',
-  'Geminis',
+  'Gemini',
   'Cancer',
   'Leo',
   'Virgo',
@@ -142,36 +142,6 @@ class _MenuPrincipal extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _AppBar extends StatelessWidget {
-  const _AppBar({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-      decoration: BoxDecoration(
-        color: const Color(0XFF002233),
-      ),
-      child: Column(
-        children: [
-          Text(
-            'Horoscope ${annioActual.year}',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 32,
-            ),
-          ),
-        ],
       ),
     );
   }

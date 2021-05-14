@@ -7,7 +7,7 @@ using System.Net.Http;
 
 namespace horoscopoapi.Controllers
 {
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/[controller]/[action]")]
     [ApiController]
     public class HoroscopeController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace horoscopoapi.Controllers
         /// <param name="sign">Zodiac sign to request information.</param>
         /// <returns></returns>
         [HttpGet("{sign}")]
-        public async Task<string> GetAllDetails (string sign)
+        public async Task<string> GetAllDetails([FromRoute] string sign)
         {
 
             var clientHandler = new HttpClientHandler
