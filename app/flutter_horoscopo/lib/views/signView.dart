@@ -1,14 +1,22 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_horoscopo/models/horoscope.dart';
 import 'package:http/http.dart' as http;
 
 Future<Horoscope> fetchDataSign(String _signName) async {
-  final response = await http.get(
-    Uri.http('horoscopoapi.centralus.azurecontainer.io',
-        'api/v1/horoscope/getalldetails/' + _signName),
+  final response = await http.post(
+    Uri.https(
+      'aztro.sameerkumar.website',
+      '/',
+      // Query Elements
+      {
+        "sign": "$_signName",
+        "day": "today",
+      },
+    ),
   );
 
   // Validate if the response is OK.
@@ -44,6 +52,8 @@ class __StateSignViewState extends State<StateSignView> {
 
   @override
   Widget build(BuildContext context) {
+    // debugPrint(futureHoroscope.asStream().toString());
+
     return Scaffold(
       backgroundColor: const Color(0xFF002233),
       appBar: AppBar(
@@ -293,7 +303,7 @@ class _MainContent extends StatelessWidget {
             ],
           );
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          return Text("${snapshot.toString()}");
         }
 
         return LinearProgressIndicator();
