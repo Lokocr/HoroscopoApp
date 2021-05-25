@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_horoscopo/models/horoscope.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:flutter_horoscopo/helpers/adsHelper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 Future<Horoscope> fetchDataSign(String _signName) async {
   final response = await http.post(
     Uri.https(
@@ -44,10 +47,43 @@ class __StateSignViewState extends State<StateSignView> {
 
   __StateSignViewState(this.signName);
 
+  static final _kAdIndex = 4;
+  BannerAd _ad;
+  bool _isAdLoaded = false;
+
+  int _getDestinationItemIndex(int rawIndex) {
+    if (rawIndex >= _kAdIndex && _isAdLoaded) {
+      return rawIndex - 1;
+    }
+    return rawIndex;
+  }
+
   @override
   void initState() {
     super.initState();
     futureHoroscope = fetchDataSign(this.signName);
+
+    // Creamos el Banner
+    _ad = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: AdListener(
+        onAdLoaded: (_) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+
+          print('Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    );
+
+    _ad.load();
   }
 
   @override
@@ -61,6 +97,17 @@ class __StateSignViewState extends State<StateSignView> {
         centerTitle: true,
         backgroundColor: const Color(0xFF002233),
         elevation: 0,
+        bottom: PreferredSize(
+          child: Container(
+            width: _ad.size.width.toDouble(),
+            height: 72.0,
+            alignment: Alignment.center,
+            child: AdWidget(
+              ad: _ad,
+            ),
+          ),
+          preferredSize: Size.fromHeight(80.0),
+        ),
       ),
       body: _MainContent(
         horoscope: futureHoroscope,

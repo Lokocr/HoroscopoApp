@@ -5,6 +5,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_horoscopo/views/signView.dart';
 
+import 'package:flutter_horoscopo/helpers/adsHelper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
@@ -49,6 +52,10 @@ final List<String> entries = <String>[
 ];
 
 class MyApp extends StatelessWidget {
+  Future<InitializationStatus> _initGoogleMobileAds() {
+    return MobileAds.instance.initialize();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
