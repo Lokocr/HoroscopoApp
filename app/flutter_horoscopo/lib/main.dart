@@ -51,9 +51,49 @@ final List<String> entries = <String>[
   'Pisces'
 ];
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   Future<InitializationStatus> _initGoogleMobileAds() {
     return MobileAds.instance.initialize();
+  }
+
+  late BannerAd _bannerAd;
+
+  bool _isBannerAdReady = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _bannerAd.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          setState(() {
+            _isBannerAdReady = true;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          print('Failed to load a banner ad: ${err.message}');
+          _isBannerAdReady = false;
+          ad.dispose();
+        },
+      ),
+    );
+
+    _bannerAd.load();
   }
 
   @override
@@ -66,7 +106,21 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         backgroundColor: const Color(0xFF002233),
-        drawer: _DrawerPrincipal(),
+        bottomNavigationBar: SizedBox(
+          height: 60.0,
+          child: Container(
+            child: Column(
+              children: [
+                if (_isBannerAdReady)
+                  SizedBox(
+                    width: _bannerAd.size.width.toDouble(),
+                    height: _bannerAd.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd),
+                  ),
+              ],
+            ),
+          ),
+        ),
         appBar: AppBar(
           title: Text('Horoscope ${annioActual.year}'),
           centerTitle: true,
@@ -86,10 +140,43 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class _MenuPrincipal extends StatelessWidget {
+class _MenuPrincipal extends StatefulWidget {
   const _MenuPrincipal({
-    Key key,
+    Key? key,
   }) : super(key: key);
+
+  @override
+  State<_MenuPrincipal> createState() => _MenuPrincipalState();
+}
+
+class _MenuPrincipalState extends State<_MenuPrincipal> {
+  InterstitialAd? _interstitialAd;
+
+  bool _isInterstitialAdReady = false;
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          this._interstitialAd = ad;
+
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+            },
+          );
+
+          _isInterstitialAdReady = true;
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load an interstitial ad: ${err.message}');
+          _isInterstitialAdReady = false;
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,49 +189,44 @@ class _MenuPrincipal extends StatelessWidget {
           itemCount: entries.length,
           scrollDirection: Axis.vertical,
           itemBuilder: (BuildContext context, int index) {
-            return Container(
-              width: double.infinity,
-              margin: EdgeInsets.all(10),
-              child: Stack(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    child: Image(
-                      image:
-                          AssetImage('assets/graphics/${entriesImages[index]}'),
+            return GestureDetector(
+              onTap: () {
+                _loadInterstitialAd();
+                if (_isInterstitialAdReady) {
+                  _interstitialAd?.show();
+                }
+
+                callSignView(context, index);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Stack(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      child: Image(
+                        image: AssetImage(
+                            'assets/graphics/${entriesImages[index]}'),
+                      ),
                     ),
-                  ),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                    child: TextButton(
-                      onPressed: () => {debugPrint('Prueba ${entries[index]}')},
+                    Container(
+                      alignment: Alignment.bottomCenter,
+                      margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
                       child: Container(
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.white)),
-                          onPressed: () => {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => StateSignView(
-                                  signName: entries[index],
-                                ),
-                              ),
-                            )
-                          },
-                          child: Text(
-                            '${entries[index]}',
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0)),
+                        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                        child: Text(
+                          '${entries[index]}',
+                          style: TextStyle(
+                            color: Colors.black,
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -152,51 +234,13 @@ class _MenuPrincipal extends StatelessWidget {
       ),
     );
   }
-}
 
-class _DrawerPrincipal extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.fromLTRB(0, 40, 0, 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
-        child: Drawer(
-          elevation: 2,
-          child: ListView(
-            padding: EdgeInsets.all(0),
-            children: [
-              DrawerHeader(
-                // padding: EdgeInsets.all(20),
-                child: Text(
-                  'Horoscopo ${annioActual.year}',
-                  style: TextStyle(
-                    fontSize: 42,
-                    color: Colors.white,
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF002233),
-                ),
-              ),
-              ListTile(
-                title: Text('Settings'),
-                leading: Icon(Icons.home),
-              ),
-              ListTile(
-                title: Text('Comming soon...'),
-                leading: Icon(Icons.info_outline),
-              ),
-              Divider(),
-              ListTile(
-                title: Text('Privacy Policy'),
-                leading: Icon(Icons.security),
-              ),
-            ],
-          ),
+  Future<dynamic> callSignView(BuildContext context, int index) {
+    return Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StateSignView(
+          signName: entries[index],
         ),
       ),
     );

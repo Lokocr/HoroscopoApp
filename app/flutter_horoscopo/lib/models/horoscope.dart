@@ -13,22 +13,22 @@ class Horoscope {
   final String color;
   final String lucky_number;
   final String lucky_time;
-  String sign;
+  late String sign;
 
   // Create the constructor.
   Horoscope({
     // @required this.horoscope,
     // @required this.date,
     // @required this.sign,
-    @required this.date_range,
-    @required this.current_date,
-    @required this.compatibility,
-    @required this.color,
-    @required this.lucky_number,
-    @required this.lucky_time,
-    @required this.description,
-    @required this.mood,
-    this.sign,
+    required this.date_range,
+    required this.current_date,
+    required this.compatibility,
+    required this.color,
+    required this.lucky_number,
+    required this.lucky_time,
+    required this.description,
+    required this.mood,
+    sign,
   });
 
   factory Horoscope.fromJson(Map<String, dynamic> json) {

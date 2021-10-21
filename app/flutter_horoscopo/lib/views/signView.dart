@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_horoscopo/models/horoscope.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_horoscopo/helpers/adsHelper.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<Horoscope> fetchDataSign(String _signName) async {
   final response = await http.post(
@@ -35,55 +34,54 @@ Future<Horoscope> fetchDataSign(String _signName) async {
 class StateSignView extends StatefulWidget {
   final String signName;
 
-  StateSignView({Key key, @required this.signName}) : super(key: key);
+  StateSignView({Key? key, required this.signName}) : super(key: key);
 
   @override
   __StateSignViewState createState() => __StateSignViewState(this.signName);
 }
 
 class __StateSignViewState extends State<StateSignView> {
-  Future<Horoscope> futureHoroscope;
-  final String signName;
-
   __StateSignViewState(this.signName);
 
-  static final _kAdIndex = 4;
-  BannerAd _ad;
-  bool _isAdLoaded = false;
+  String signName;
 
-  int _getDestinationItemIndex(int rawIndex) {
-    if (rawIndex >= _kAdIndex && _isAdLoaded) {
-      return rawIndex - 1;
-    }
-    return rawIndex;
+  late Future<Horoscope> futureHoroscope;
+
+  late BannerAd _bannerAd;
+
+  bool _isBannerAdReady = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _bannerAd.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+
     futureHoroscope = fetchDataSign(this.signName);
 
-    // Creamos el Banner
-    _ad = BannerAd(
+    _bannerAd = BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
       request: AdRequest(),
-      listener: AdListener(
+      size: AdSize.banner,
+      listener: BannerAdListener(
         onAdLoaded: (_) {
           setState(() {
-            _isAdLoaded = true;
+            _isBannerAdReady = true;
           });
         },
-        onAdFailedToLoad: (ad, error) {
-          // Releases an ad resource when it fails to load
+        onAdFailedToLoad: (ad, err) {
+          print('Failed to load a banner ad: ${err.message}');
+          _isBannerAdReady = false;
           ad.dispose();
-
-          print('Ad load failed (code=${error.code} message=${error.message})');
         },
       ),
     );
 
-    _ad.load();
+    _bannerAd.load();
   }
 
   @override
@@ -92,22 +90,26 @@ class __StateSignViewState extends State<StateSignView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF002233),
+      bottomNavigationBar: SizedBox(
+        height: 60.0,
+        child: Container(
+          child: Column(
+            children: [
+              if (_isBannerAdReady)
+                SizedBox(
+                  width: _bannerAd.size.width.toDouble(),
+                  height: _bannerAd.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
         title: Text('Horoscope ${this.signName}'),
         centerTitle: true,
         backgroundColor: const Color(0xFF002233),
         elevation: 0,
-        bottom: PreferredSize(
-          child: Container(
-            width: _ad.size.width.toDouble(),
-            height: 72.0,
-            alignment: Alignment.center,
-            child: AdWidget(
-              ad: _ad,
-            ),
-          ),
-          preferredSize: Size.fromHeight(80.0),
-        ),
       ),
       body: _MainContent(
         horoscope: futureHoroscope,
@@ -120,8 +122,8 @@ class _MainContent extends StatelessWidget {
   final Future<Horoscope> horoscope;
 
   const _MainContent({
-    Key key,
-    @required this.horoscope,
+    Key? key,
+    required this.horoscope,
   }) : super(key: key);
 
   @override
@@ -160,7 +162,7 @@ class _MainContent extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  'Date: ',
+                                  'Date',
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Colors.white,
@@ -169,7 +171,7 @@ class _MainContent extends StatelessWidget {
                               ),
                             ),
                             Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: Container(
                                 alignment: Alignment.centerLeft,
                                 padding: EdgeInsets.all(10),
@@ -190,7 +192,7 @@ class _MainContent extends StatelessWidget {
                                       MainAxisAlignment.spaceAround,
                                   children: [
                                     Text(
-                                      snapshot.data.current_date,
+                                      snapshot.data!.current_date,
                                       style: TextStyle(
                                         fontSize: 20,
                                       ),
@@ -220,7 +222,7 @@ class _MainContent extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  'Number: ',
+                                  'Number',
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Colors.white,
@@ -249,7 +251,7 @@ class _MainContent extends StatelessWidget {
                                       MainAxisAlignment.spaceAround,
                                   children: [
                                     Text(
-                                      snapshot.data.lucky_number,
+                                      snapshot.data!.lucky_number,
                                       style: TextStyle(
                                         fontSize: 20,
                                       ),
@@ -277,7 +279,7 @@ class _MainContent extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            snapshot.data.description,
+                            snapshot.data!.description,
                             style: TextStyle(
                               fontSize: 20,
                             ),
@@ -302,7 +304,7 @@ class _MainContent extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  'Color: ',
+                                  'Color',
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Colors.white,
@@ -331,7 +333,7 @@ class _MainContent extends StatelessWidget {
                                       MainAxisAlignment.spaceAround,
                                   children: [
                                     Text(
-                                      snapshot.data.color,
+                                      snapshot.data!.color,
                                       style: TextStyle(
                                         fontSize: 20,
                                       ),
