@@ -111,10 +111,6 @@ class __StateSignViewState extends State<StateSignView> {
   }
 
   Widget mainContent(BuildContext context) {
-    // return FutureBuilder<Horoscope>(
-    //   future: futureHoroscope,
-    //   builder: (context, snapshot) {
-    //     if (snapshot.hasData) {
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -128,96 +124,244 @@ class __StateSignViewState extends State<StateSignView> {
           ),
         ),
         Expanded(
-          child: content(),
+          child: content(
+            futureHoroscope_today: futureHoroscope_today,
+            futureHoroscope_yesterday: futureHoroscope_yesterday,
+          ),
         )
       ],
     );
-    //     } else if (snapshot.hasError) {
-    //       return Text("${snapshot.toString()}");
-    //     }
-
-    //     return LinearProgressIndicator();
-    //   },
-    // );
   }
 }
 
 class content extends StatefulWidget {
+  final Future<Horoscope> futureHoroscope_today;
+  final Future<Horoscope> futureHoroscope_yesterday;
+
   const content({
     Key? key,
+    required this.futureHoroscope_today,
+    required this.futureHoroscope_yesterday,
   }) : super(key: key);
 
   @override
-  State<content> createState() => _contentState();
+  State<content> createState() =>
+      _contentState(this.futureHoroscope_today, this.futureHoroscope_yesterday);
 }
 
 class _contentState extends State<content> {
   int indexSelected = 0;
+  Future<Horoscope> futureHoroscope_today;
+  Future<Horoscope> futureHoroscope_yesterday;
+
+  _contentState(this.futureHoroscope_today, this.futureHoroscope_yesterday);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 16.0,
-        right: 16.0,
-      ),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: CustomColors.backgroundAppSecondary,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30.0),
-            topRight: Radius.circular(30.0),
-          ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
         ),
-        margin: EdgeInsets.only(
-          top: 10,
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        indexSelected = 1;
-                      });
-                    },
-                    child: Text(
-                      'Yesterday',
-                      style: TextStyle(
-                        color: (indexSelected == 1)
-                            ? Colors.white
-                            : Colors.white38,
-                        fontSize: 22.0,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        indexSelected = 0;
-                      });
-                    },
-                    child: Text(
-                      'Today',
-                      style: TextStyle(
-                        color: (indexSelected == 0)
-                            ? Colors.white
-                            : Colors.white38,
-                        fontSize: 22.0,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            // color: CustomColors.backgroundAppSecondary,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
             ),
-          ],
+          ),
+          margin: EdgeInsets.only(
+            top: 10,
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          indexSelected = 1;
+                        });
+                      },
+                      child: Text(
+                        'Yesterday',
+                        style: TextStyle(
+                          color: (indexSelected == 1)
+                              ? Colors.white
+                              : Colors.white38,
+                          fontSize: 22.0,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          indexSelected = 0;
+                        });
+                      },
+                      child: Text(
+                        'Today',
+                        style: TextStyle(
+                          color: (indexSelected == 0)
+                              ? Colors.white
+                              : Colors.white38,
+                          fontSize: 22.0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  color: CustomColors.backgroundAppSecondary,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10.0,
+                      spreadRadius: 5.0,
+                      offset: Offset(
+                        0.0,
+                        0.0,
+                      ),
+                    ),
+                  ],
+                ),
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: future_content(context,
+                      indexSelected: indexSelected,
+                      futureHoroscope_today: this.futureHoroscope_today,
+                      futureHoroscope_yesterday:
+                          this.futureHoroscope_yesterday),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+Widget future_content(BuildContext context,
+    {required int indexSelected,
+    required futureHoroscope_today,
+    required futureHoroscope_yesterday}) {
+  return FutureBuilder<Horoscope>(
+    future: (indexSelected == 0)
+        ? futureHoroscope_today
+        : futureHoroscope_yesterday,
+    builder: (context, snapshot) {
+      if (snapshot.hasData) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Compatibility: ',
+                    style: TextStyle(fontSize: 22.0, color: Colors.white)),
+                Text(
+                  snapshot.data!.compatibility,
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Color: ',
+                    style: TextStyle(fontSize: 22.0, color: Colors.white)),
+                Text(
+                  snapshot.data!.color,
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Lucky Number: ',
+                    style: TextStyle(fontSize: 22.0, color: Colors.white)),
+                Text(
+                  snapshot.data!.lucky_number,
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Lucky Time: ',
+                    style: TextStyle(fontSize: 22.0, color: Colors.white)),
+                Text(
+                  snapshot.data!.lucky_time,
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Mood: ',
+                    style: TextStyle(fontSize: 22.0, color: Colors.white)),
+                Text(
+                  snapshot.data!.mood,
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
+            Divider(
+              color: Colors.white,
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  snapshot.data!.description,
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      } else if (snapshot.hasError) {
+        return Text("${snapshot.toString()}");
+      }
+
+      return LinearProgressIndicator();
+    },
+  );
 }
