@@ -1,4 +1,4 @@
-package com.josecartin.flutter_horoscopo
+package com.daily.horoscopefree
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_horoscopo/models/horoscope.dart';
 import 'package:flutter_horoscopo/theme/custom_colors.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_horoscopo/helpers/adsHelper.dart';
@@ -93,10 +94,42 @@ class __StateSignViewState extends State<StateSignView> {
   late Future<Horoscope> futureHoroscope_today;
   late Future<Horoscope> futureHoroscope_yesterday;
 
+  Future<InitializationStatus> _initGoogleMobileAds() {
+    return MobileAds.instance.initialize();
+  }
+
+  InterstitialAd? _interstitialAd;
+
+  bool _isInterstitialAdReady = false;
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          this._interstitialAd = ad;
+
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+            },
+          );
+
+          _isInterstitialAdReady = true;
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load an interstitial ad: ${err.message}');
+          _isInterstitialAdReady = false;
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-
+    _loadInterstitialAd();
     futureHoroscope_today = fetchDataSign_Today(this.signName);
     futureHoroscope_yesterday = fetchDataSign_Yesterday(this.signName);
   }
@@ -105,7 +138,17 @@ class __StateSignViewState extends State<StateSignView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomColors.backgroundApp, //Color(0xFF14213d),
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            if (_isInterstitialAdReady) {
+              _interstitialAd?.show();
+            }
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: mainContent(context),
     );
   }
@@ -244,7 +287,8 @@ class _contentState extends State<content> {
                       futureHoroscope_yesterday:
                           this.futureHoroscope_yesterday),
                 ),
-              )
+              ),
+              SizedBox(height: 20),
             ],
           ),
         ),

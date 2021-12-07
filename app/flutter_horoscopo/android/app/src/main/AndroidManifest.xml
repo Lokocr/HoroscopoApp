@@ -1,10 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.josecartin.flutter_horoscopo">
+    package="com.daily.horoscopefree">
     <!-- Required to fetch data from the internet. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
    <application
-        android:label="Horoscopo 2021"
+        android:label="Horoscope Free"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         
@@ -42,8 +42,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <meta-data 
-          android:name="com.google.android.gms.ads.APPLICATION_ID"
-          android:value="ca-app-pub-5452229565855763~7892117408" />
+          <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5452229565855763~7892117408"/>
+       
+
+          <!-- 3940256099942544~3347511713 -->
+          <!-- 5452229565855763~7892117408 -->
     </application>
 </manifest>
