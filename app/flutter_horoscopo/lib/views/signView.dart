@@ -98,9 +98,19 @@ class __StateSignViewState extends State<StateSignView> {
     return MobileAds.instance.initialize();
   }
 
+  late BannerAd _bannerAd;
+
+  bool _isBannerAdReady = false;
+
   InterstitialAd? _interstitialAd;
 
   bool _isInterstitialAdReady = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _bannerAd.dispose();
+  }
 
   void _loadInterstitialAd() {
     InterstitialAd.load(
@@ -132,12 +142,45 @@ class __StateSignViewState extends State<StateSignView> {
     _loadInterstitialAd();
     futureHoroscope_today = fetchDataSign_Today(this.signName);
     futureHoroscope_yesterday = fetchDataSign_Yesterday(this.signName);
+
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.fullBanner,
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          setState(() {
+            _isBannerAdReady = true;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          _isBannerAdReady = false;
+          ad.dispose();
+        },
+      ),
+    );
+    _bannerAd.load();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundApp, //Color(0xFF14213d),
+      backgroundColor: CustomColors.backgroundApp,
+      bottomNavigationBar: SizedBox(
+        height: 60.0,
+        child: Container(
+          child: Column(
+            children: [
+              if (_isBannerAdReady)
+                SizedBox(
+                  width: _bannerAd.size.width.toDouble(),
+                  height: _bannerAd.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

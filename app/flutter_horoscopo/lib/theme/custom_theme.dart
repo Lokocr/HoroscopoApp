@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_horoscopo/theme/custom_colors.dart';
 
 class CustomTheme {

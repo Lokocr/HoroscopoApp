@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-
 class Horoscope {
   // Create all props.
   // final String horoscope;
